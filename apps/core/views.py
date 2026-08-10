@@ -1,4 +1,5 @@
-
+import redis
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db import connections
@@ -15,7 +16,8 @@ class HealthCheckView(APIView):
             status["database"] = "error"
             status["status"] = "unhealthy"
         try:
-            get_redis_connection("default").ping()
+            redis_client = redis.from_url(settings.REDIS_URL)
+            redis_client.ping()
         except Exception:
             status["redis"] = "error"
             status["status"] = "unhealthy"
