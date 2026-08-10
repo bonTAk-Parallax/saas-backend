@@ -1,9 +1,11 @@
 
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from apps.core.commons.dynamic_serializers import DynamicFieldsModelSerializer
 from apps.user.jwt_utils import get_jwt_response
+
+User = get_user_model()
 
 class UserSerializer(DynamicFieldsModelSerializer):
     class Meta:
@@ -29,5 +31,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         return get_jwt_response(self.user)
-    
-    
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
