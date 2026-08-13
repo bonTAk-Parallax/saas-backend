@@ -1,10 +1,10 @@
 
 
 from rest_framework import serializers
-from apps.core.commons.dynamic_serializers import DynamicFieldsModelSerializer
+from apps.core.commons.dynamic_serializers import TenantAwareModelSerializer
 from apps.task.models import Comment
 
-class CommentSerializer(DynamicFieldsModelSerializer):
+class CommentSerializer(TenantAwareModelSerializer):
     author_username = serializers.CharField(source='author.username', read_only=True)
 
     class Meta:

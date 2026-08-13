@@ -18,7 +18,7 @@ from apps.user.serializers import (
     CustomTokenObtainPairSerializer,
     UserSerializer
 )
-from apps.user.jwt_utils import get_jwt_response
+from apps.user.utils import get_jwt_response
 
 
 class RegisterView(generics.CreateAPIView):
@@ -41,11 +41,11 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     throttle_scope = "auth"
 
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        user = request.user
-        user.last_login = now()
-        user.save(update_fields=['last_login'])
-        return response
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user  # <- the actually-authenticated user
+        User.objects.filter(pk=user.pk).update(last_login=now())
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class RequestPasswordResetView(generics.GenericAPIView):
