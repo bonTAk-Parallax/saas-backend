@@ -1,21 +1,29 @@
 
 class TenantAwareMixin:
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        org = self.request.user.profile.organization
-        model = queryset.model
+    """
+    Provides automatic organization-level isolation for tenant-scoped views.
 
-        if hasattr(model, 'organization') and model._meta.get_field('organization').related_model.__name__ == 'Organization':
-            return queryset.filter(organization=org)
-        if hasattr(model, 'project'):
-            return queryset.filter(project__organization=org)
-        if hasattr(model, 'task'):
-            return queryset.filter(task__project__organization=org)
-        return queryset
+    get_queryset():
+        Restricts all queries to records belonging to the authenticated
+        user's organization. If the user has no profile, returns an empty
+        queryset for safety.
+
+    perform_create():
+        Automatically assigns the user's organization to root tenant models.
+        For models with indirect tenant relationships, the organization is
+        derived through the validated related object.
+    """
+    def get_queryset(self):
+        qs = super().get_queryset()
+        profile = getattr(self.request.user, "profile", None)
+        if profile is None:
+            return qs.none()
+        return qs.filter(**qs.model.tenant_lookup(profile.organization))
 
     def perform_create(self, serializer):
-        if hasattr(serializer.Meta.model, 'organization'):
+        model = serializer.Meta.model
+        if model.is_root_tenant_field():
             serializer.save(organization=self.request.user.profile.organization)
         else:
-            serializer.save()
+            serializer.save()  
             

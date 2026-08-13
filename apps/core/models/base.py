@@ -62,4 +62,29 @@ class AuditModel(BaseModel):
 
     class Meta:
         abstract = True
-        
+
+
+class TenantScopedModel(BaseModel):
+    TENANT_LOOKUP: str = None
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def tenant_lookup(cls, organization):
+        if cls.TENANT_LOOKUP is None:
+            raise NotImplementedError(f"{cls.__name__} must define TENANT_LOOKUP")
+        return {cls.TENANT_LOOKUP: organization}
+
+    @classmethod
+    def is_root_tenant_field(cls):
+        """True if this model's tenant lookup IS the organization FK directly
+        (e.g. Project.organization), vs. reached through a chain (e.g. Task.project__organization)."""
+        return cls.TENANT_LOOKUP is not None and "__" not in cls.TENANT_LOOKUP
+
+    def resolve_tenant(self):
+        value = self
+        for part in self.TENANT_LOOKUP.split("__"):
+            value = getattr(value, part)
+        return value
+    

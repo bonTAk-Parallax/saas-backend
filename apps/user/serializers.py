@@ -30,8 +30,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        return get_jwt_response(self.user)
-
+        data.update(get_jwt_response(self.user))
+        return data
 
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    
