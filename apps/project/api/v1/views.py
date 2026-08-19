@@ -6,10 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 from django_rq import enqueue
 from apps.core.commons.mixins import TenantAwareMixin
 from apps.core.models import ExportJob
-from apps.core.permissions import HasTenantAccess, HasScope
+from apps.core.permissions.permissions import HasTenantAccess, HasScope
 from apps.project.models import Project
-from apps.core.serializers.export import ExportJobSerializer
-from apps.project.serializers import ProjectSerializer
+from apps.core.api.v1.serializers.export import ExportJobSerializer
+from apps.project.api.v1.serializers import ProjectSerializer
 
 class ProjectViewSet(TenantAwareMixin, viewsets.ModelViewSet):
     queryset = Project.objects.all().prefetch_related("tasks")

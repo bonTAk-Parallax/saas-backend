@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from apps.core.commons.mixins import TenantAwareMixin
 from apps.task.models import Task, Comment
-from apps.core.permissions import HasTenantAccess, HasScope
-from apps.task.serializers.comments import CommentSerializer
-from apps.task.serializers.tasks import TaskSerializer
+from apps.core.permissions.permissions import HasTenantAccess, HasScope
+from apps.task.api.v1.serializers.comments import CommentSerializer
+from apps.task.api.v1.serializers.tasks import TaskSerializer
 from django.core.exceptions import PermissionDenied
 
 class TaskViewSet(TenantAwareMixin, viewsets.ModelViewSet):

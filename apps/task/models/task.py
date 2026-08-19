@@ -25,7 +25,7 @@ class Task(TenantScopedModel, AuditModel):
         blank=True,
     )
 
-    TENANT_FIELD = "organization"
+    TENANT_FIELD = "project__organization"
 
     class Meta:
         constraints = [

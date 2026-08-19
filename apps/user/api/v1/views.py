@@ -12,7 +12,7 @@ from django.utils.timezone import now
 
 User = get_user_model()
 
-from apps.user.serializers import (
+from apps.user.api.v1.serializers import (
     PasswordResetRequestSerializer,
     UserRegistrationSerializer,
     CustomTokenObtainPairSerializer,
