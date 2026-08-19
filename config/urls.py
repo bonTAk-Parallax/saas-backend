@@ -19,14 +19,14 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from apps.user.views import (
+from apps.user.api.v1.views import (
     RegisterView, CustomTokenObtainPairView,
     RequestPasswordResetView, ConfirmPasswordResetView,
     UserViewSet
 )
-from apps.project.views import ProjectViewSet
-from apps.task.views import TaskViewSet
-from apps.core.views import HealthCheckView
+from apps.project.api.v1.views import ProjectViewSet
+from apps.task.api.v1.views import TaskViewSet
+from apps.core.api.v1.views import HealthCheckView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
