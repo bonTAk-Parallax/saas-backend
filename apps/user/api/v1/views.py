@@ -9,6 +9,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.utils.timezone import now
+from apps.user.services import register_user
 
 User = get_user_model()
 
@@ -31,7 +32,7 @@ class RegisterView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        user = register_user(**serializer.validated_data)
         return Response(get_jwt_response(user), status=status.HTTP_201_CREATED)
 
 
@@ -43,7 +44,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.user  # <- the actually-authenticated user
+        user = serializer.user
         User.objects.filter(pk=user.pk).update(last_login=now())
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 

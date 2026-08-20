@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-
+from apps.core.api.v1.views.export import ExportJobViewSet
+from apps.core.api.v1.views.health import HealthCheckView, ReadinessView
 from apps.user.api.v1.views import (
     RegisterView, CustomTokenObtainPairView,
     RequestPasswordResetView, ConfirmPasswordResetView,
@@ -26,12 +27,12 @@ from apps.user.api.v1.views import (
 )
 from apps.project.api.v1.views import ProjectViewSet
 from apps.task.api.v1.views import TaskViewSet
-from apps.core.api.v1.views import HealthCheckView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'projects', ProjectViewSet, basename='project')
 router.register(r'tasks', TaskViewSet, basename='task')
+router.register(r'export-jobs', ExportJobViewSet, basename='exportjob')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,8 +42,9 @@ urlpatterns = [
     path('api/v1/password-reset/', RequestPasswordResetView.as_view(), name='password_reset'),
     path('api/v1/password-reset/confirm/', ConfirmPasswordResetView.as_view(), name='password_reset_confirm'),
     path('api/v1/health/', HealthCheckView.as_view(), name='health_check'),
+    path('api/v1/readiness/', ReadinessView.as_view(), name='readiness_check'),
     path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/v1/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/v1/jobs/<str:job_id>/', include('django_rq.urls')),  
+    path('api/v1/rq/', include('django_rq.urls')),
 ]
 

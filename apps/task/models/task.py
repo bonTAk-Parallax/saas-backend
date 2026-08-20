@@ -31,6 +31,11 @@ class Task(TenantScopedModel, AuditModel):
         constraints = [
             models.UniqueConstraint(fields=['project', 'title'], name='unique_task_title_per_project')
         ]
+        indexes = [
+            models.Index(fields=['project', 'is_done']),
+            models.Index(fields=['project', 'due_date']),
+            models.Index(fields=['assigned_to']),
+        ]
 
 
     def __str__(self):
