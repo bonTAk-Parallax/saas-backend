@@ -31,10 +31,17 @@ class ExportJob(BaseModel):
     job_id = models.CharField(
         max_length=255,
         unique=True,
+        null=True,
+        blank=True
     )
 
     completed_at = models.DateTimeField(
         null=True,
         blank=True,
     )
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['organization', 'status', 'created_at']),
+        ]
     

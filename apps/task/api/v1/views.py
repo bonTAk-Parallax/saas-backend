@@ -8,7 +8,7 @@ from apps.task.models import Task, Comment
 from apps.core.permissions.permissions import HasTenantAccess, HasScope
 from apps.task.api.v1.serializers.comments import CommentSerializer
 from apps.task.api.v1.serializers.tasks import TaskSerializer
-from django.core.exceptions import PermissionDenied
+from apps.task.services import create_task, delete_task
 
 class TaskViewSet(TenantAwareMixin, viewsets.ModelViewSet):
     queryset = Task.objects.all().select_related(
@@ -42,6 +42,15 @@ class TaskViewSet(TenantAwareMixin, viewsets.ModelViewSet):
             qs = qs.filter(project_id=project_id)
 
         return qs
+
+    def get_serializer_context(self):
+        return {**super().get_serializer_context(), 'request': self.request}
+
+    def perform_create(self, serializer):
+            create_task(user=self.request.user, **serializer.validated_data)
+
+    def perform_destroy(self, instance):
+            delete_task(user=self.request.user, task=instance)  
 
     @action(detail=True, methods=["get", "post"], url_path="comments")
     def comments(self, request, pk=None):

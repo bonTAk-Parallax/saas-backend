@@ -14,10 +14,11 @@ class UserSerializer(DynamicFieldsModelSerializer):
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=6)
+    organization_name = serializers.CharField(write_only=True, max_length=255)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'organization_name']
 
     def create(self, validated_data):
         user = User.objects.create_user(

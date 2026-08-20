@@ -27,10 +27,7 @@ environ.Env.read_env(BASE_DIR / ".env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+CORS_ALLOW_ALL_ORIGINS = False
 
 AUTH_USER_MODEL = "user.User"
 
@@ -95,8 +92,35 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'apps.core.commons.middleware.LastActivityMiddleware'
+    'apps.core.commons.middlewares.last_activity.LastActivityMiddleware',
+    'apps.core.commons.middlewares.request_id.RequestIDMiddleware',
+    'apps.core.commons.middlewares.idempotency.IdempotencyMiddleware',
 ]
+
+LOGGING = {
+    "version": 1,
+    "filters": {
+        "request_id": {
+            "()": "apps.core.commons.middlewares.request_id.RequestIDLogFilter",
+        },
+    },
+    "formatters": {
+        "verbose": {
+            "format": "[%(request_id)s] %(asctime)s %(levelname)s %(name)s: %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "filters": ["request_id"],
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+}
 
 ROOT_URLCONF = 'config.urls'
 REDIS_URL = env('REDIS_URL', default='redis://localhost:6379/0')
@@ -129,7 +153,6 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': False,
 }
 
-CORS_ALLOW_ALL_ORIGINS = DEBUG
 SPECTACULAR_SETTINGS = {'TITLE': 'SAAS-BACKEND API', 'VERSION': '1.0.0'}
 
 TEMPLATES = [
