@@ -17,7 +17,7 @@ class Comment(TenantScopedModel, AuditModel):
     )
     text = models.TextField()
 
-    TENANT_FIELD = "task__project__organization"
+    TENANT_LOOKUP = "task__project__organization"
 
     def __str__(self):
         return f"{self.author} - {self.task}"

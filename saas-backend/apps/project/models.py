@@ -13,7 +13,7 @@ class Project(TenantScopedModel, AuditModel):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
-    TENANT_FIELD = "organization"
+    TENANT_LOOKUP = "organization"
 
     class Meta:
         constraints = [
