@@ -1,10 +1,11 @@
 from django.db import models
 
-from apps.core.models import BaseModel
+# from apps.core.models import BaseModel
+from apps.core.models.base import TenantScopedModel
 from apps.organization.models import Organization
 
 
-class ExportJob(BaseModel):
+class ExportJob(TenantScopedModel):
 
     class Status(models.TextChoices):
         PENDING = "PENDING", "Pending"
@@ -39,6 +40,8 @@ class ExportJob(BaseModel):
         null=True,
         blank=True,
     )
+
+    TENANT_LOOKUP = 'organization'
 
     class Meta:
         indexes = [

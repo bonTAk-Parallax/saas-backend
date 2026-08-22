@@ -11,17 +11,21 @@ class HasTenantAccess(BasePermission):
 
 
 class HasScope(BasePermission):
-    """Allow access when the user's role has the required scope."""
-
     def has_permission(self, request, view):
-        required = getattr(view, "required_scopes", set())
+        required_map = getattr(view, "required_scopes", {})
+        
+        if isinstance(required_map, dict):
+            required = required_map.get(view.action, set())
+        else:
+            required = required_map
+
         if not required:
             return True
-        
+
         profile = getattr(request.user, "profile", None)
         if profile is None:
             return False
-        
+
         user_scopes = ROLE_SCOPES.get(profile.role, set())
         return required.issubset(user_scopes)
     

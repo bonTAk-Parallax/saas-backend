@@ -40,7 +40,7 @@ def create_export_job(*, organization, user):
 
 def _enqueue_export(export_job_id, request_id):
     job = queue_task(
-        'apps.project.tasks.generate_export',
+        'apps.project.tasks.export.generate_export',
         str(export_job_id), request_id,
     )
     ExportJob.objects.filter(id=export_job_id).update(job_id=job.id)

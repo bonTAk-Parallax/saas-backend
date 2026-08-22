@@ -14,6 +14,7 @@ class UserProfile(models.Model):
         Organization,
         on_delete=models.CASCADE,
         related_name="members",
+        null=True, blank=True
     )
 
     role = models.CharField(max_length=20, default='MEMBER')

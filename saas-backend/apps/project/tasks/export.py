@@ -5,16 +5,17 @@ import logging
 from django.utils.timezone import now
 import django_rq
 from django_rq import job
+from rq import get_current_job
 from apps.core.models.export import ExportJob
 from apps.project.models import Project
-from apps.project.services import mark_export_completed
-from config import settings
+from apps.project.services.export import mark_export_completed
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 @job('default')
 def generate_export(export_job_id, request_id=""):
-    current_job = django_rq.get_current_job()
+    current_job = get_current_job()
     log = logging.LoggerAdapter(logger, {'request_id': request_id})
 
     try:

@@ -29,9 +29,22 @@ class ProjectViewSet(TenantAwareMixin, viewsets.ModelViewSet):
         )
         serializer.instance = project  
 
+    # @action(detail=False, methods=["post"], url_path="export")
+    # def export(self, request):
+    #     export_job = create_export_job(
+    #         organization=request.user.profile.organization, user=request.user,
+    #     )
+    #     return Response({"job_id": export_job.id}, status=status.HTTP_201_CREATED)
+
     @action(detail=False, methods=["post"], url_path="export")
     def export(self, request):
         export_job = create_export_job(
             organization=request.user.profile.organization, user=request.user,
         )
-        return Response({"job_id": export_job.id}, status=status.HTTP_201_CREATED)
+        # Reuse the real serializer instead of a hand-rolled dict, so the
+        # create response and the later GET /export-jobs/{id}/ response
+        # always agree on field names — no more silent "job_id" vs "id" drift.
+        from apps.core.api.v1.serializers.export import ExportJobSerializer
+        return Response(ExportJobSerializer(export_job).data, status=status.HTTP_201_CREATED)
+
+    

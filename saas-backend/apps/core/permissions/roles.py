@@ -3,9 +3,11 @@ from collections import defaultdict
 
 
 ROLE_MATRIX = {
+    ("projects", "read"): {"ADMIN", "MANAGER", "MEMBER"},
     ("projects", "write"): {"ADMIN", "MANAGER"},
     ("projects", "delete"): {"ADMIN"},
 
+    ("tasks", "read"): {"ADMIN", "MANAGER", "MEMBER"},
     ("tasks", "write"): {"ADMIN", "MANAGER", "MEMBER"},
     ("tasks", "delete"): {"ADMIN", "MANAGER"},
 
