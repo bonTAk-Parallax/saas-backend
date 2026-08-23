@@ -1,0 +1,90 @@
+services:
+
+  db:
+    image: postgres:15-alpine
+    container_name: taskplatform_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: taskplatform_redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ./saas-backend
+    container_name: taskplatform_web
+    restart: unless-stopped
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./saas-backend:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./saas-backend/.env
+    environment:
+      # These two override whatever's in saas-backend/.env — inside Docker,
+      # services reach each other by service name, not localhost.
+      - DB_HOST=db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./saas-backend
+    container_name: taskplatform_worker
+    restart: unless-stopped
+    command: python manage.py rqworker default
+    volumes:
+      - ./saas-backend:/app
+    env_file:
+      - ./saas-backend/.env
+    environment:
+      - DB_HOST=db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./saas-frontend
+    container_name: taskplatform_frontend
+    restart: unless-stopped
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./saas-frontend:/app
+      # Anonymous volume — stops the bind mount above from overwriting
+      # node_modules installed inside the container.
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./saas-frontend/.env
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
