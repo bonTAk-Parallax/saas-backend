@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from apps.core.commons.dynamic_serializers import DynamicFieldsModelSerializer
 from apps.user.utils import get_jwt_response
-
+from apps.user.services import register_user
 User = get_user_model()
 
 class UserSerializer(DynamicFieldsModelSerializer):
@@ -21,12 +21,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password', 'organization_name']
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data.get('email', ''),
-            password=validated_data['password']
-        )
-        return user
+        return register_user(**validated_data)
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
