@@ -29,12 +29,14 @@ from apps.user.api.v1.views import (
 )
 from apps.project.api.v1.views import ProjectViewSet
 from apps.task.api.v1.views import TaskViewSet
+from apps.organization.views import InviteViewSet
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'projects', ProjectViewSet, basename='project')
 router.register(r'tasks', TaskViewSet, basename='task')
 router.register(r'export-jobs', ExportJobViewSet, basename='exportjob')
+router.register(r'invites', InviteViewSet, basename='invite')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
