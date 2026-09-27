@@ -12,6 +12,9 @@ ROLE_MATRIX = {
     ("tasks", "delete"): {"ADMIN", "MANAGER"},
 
     ("exports", "create"): {"ADMIN", "MANAGER"},
+
+    ("invites", "read"): {"ADMIN", "MANAGER"},
+    ("invites", "create"): {"ADMIN", "MANAGER"},
 }
 
 
